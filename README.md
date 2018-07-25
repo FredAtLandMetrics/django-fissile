@@ -2,7 +2,7 @@
 Fissile makes good system design with Django a little easier.
 
 ## Intro
-A frequent pattern in the evolution of a Django application is that:
+A frequent pattern in the evolution of a Django application (or a Rails application) is that:
 1) the app starts with changing requirements, lots of ORM code in the views,
    and few tests
 2) then, as requirements solidify and the code matures, the ORM code moves
