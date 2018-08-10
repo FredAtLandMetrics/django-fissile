@@ -1,38 +1,76 @@
-# Fissile
-Fissile makes good system design with Django a little easier.
+# For *salaried* perfectionists with deadlines
+In other, less tongue-in-cheek words, Fissile lends developers a few decorators and run-time 
+config options that improve legibility, scalability, and testability in complex Django sites.
 
-## Intro
-A frequent pattern in the evolution of a Django application is that:
-1) the app starts with changing requirements, lots of ORM code in the views,
-   and few tests
-2) then, as requirements solidify and the code matures, the ORM code moves
-   to domain-specific functions and the data layer is abstracted to hide
-   ORM-based implementation details
-3) once the data layer is abstracted, the web servers can be broken up into
-   front-end and back-end servers along the data layer abstraction divide such
-   that the data-specific functions are made available to the views on the
-   front-end servers via data-specific API endpoints which map to each
-   function
-   
-The main reason for transitioning from step 1 to step 2 is to make the
-codebase easier to test and easier to read.
+Proper use of Fissile makes Django a more manageable place.
 
-But the move to step 3 comes with some fairly significant scaling 
-opportunities.
+## Why? Django is so perfect already...
+### Old habits
+A long time ago (think pre-Rails), I got in the habit of sequestering any code I wrote that 
+interacted with a database behind a domain-based set of modules.  I’d figured out that there 
+was a lot of redundant code strewn about and wrangling it to well-defined data layer kept 
+things tidy.
 
-First off, the frontend servers no longer communicate with anything but
-backend servers and the backend servers are HTTPS.  So the frontend servers
-can easily be made asynchronous using Tornado or several other async
-frameworks.  Without database connections, the frontend servers scale to
-handle many more client connections.
+Later, when I adopted some TDD practices, I found that testing these data-layer methods 
+required a database connection, which was unfortunate, but when I figured out how to use 
+mock (or whatever terrible substitute I’d come up with before I found mock), I found that 
+testing calls to these methods was easy and fast.
 
-Step 3 also removes the burden of template rendering from the backend servers
-so there's no unnecessary CPU load on the server slowing backend data
-processing.
+It was handy too when I needed to make a fairly significant change like a switch from one 
+database to another or when I needed to split a database across multiple servers.  The 
+surface area of the data layer was literally as small as possible (ideally) so such 
+changes were a lot more tractable than they would otherwise have been.
 
-Fissile combines step 2 and 3.
+If I needed to do some caching to ease the pressure on the database, it was a relatively 
+straightforward thing to do.  If I needed to separate frontend template-rendering code from 
+backend processor- and/or network-hungry backend services, the data layer methods made a 
+conveniently small set of changes necessary to achieve the goal.
 
-## Quickstart
+It worked well enough that, once,  when I was contracted to work on a Rails project that was 
+particularly riddled with comments like “Beware all those who pass by this comment!” and 
+“Here be dragons!”, my precondition for accepting the contract was that we first be allowed 
+to move all database interactions out of the top-level controller methods and into 
+domain-based modules that could be tested and instrumented.
+
+### New Challenges
+So, more recently, I’m involved with a codebase that’s very mature and reasonably 
+well-behaved.  But it’s hard to work with because it just interacts with the database 
+wherever and however it needs to.  Tests take __for-ev-er__ because most of them interact 
+with the database.  Don’t get me wrong, there’s high-quality code in there, but sometimes 
+it is very difficult and/or time-consuming to work with.
+
+In a very real way, it just burns money and that bugs me.  So I conceived of this construct 
+to speed along its beautification.  Ideally, it will achieve my selfish goal of wanting to 
+constrain the wild ORM rumpus and, at the same time, it will make some very provable gains 
+in testability and scalability.
+
+## The Quantified Problem and The Fix
+### the Quantified Problem
+
+### The Fix
+The first part of the fix for the slippage of the understandable and lawful world into 
+wildly prolific database-active code is to wrestle any and all code that interacts with 
+the database into a limited set of domain-specific methods.  There should be no leakage 
+of information about the storage mechanism into the rest of the codebase.  Is my business 
+logic stored in the database?  On a disk?  On a blockchain?  You won’t know by looking at 
+the data layer methods.
+
+That part has nothing to do with Fissile.  But it’s a Good Idea.  You can limit your 
+integration tests to only those methods that need to interact with the database and 
+everything else is a very fast unit test.  If you stop here, you will have done great 
+things for the maintainability of your codebase.
+
+Fissile simply makes it easy to split the codebase into front-end and back-end services.  
+It adds a @fissile.func decorator that allows the frontend server and to interact with a 
+function as it would without the decorator but, unbeknownst to the caller, cause an HTTP 
+query to a backend service that will perform the data layer actions.
+
+Since the front-end servers end up depending only on the availability of the backend 
+servers, it is often possible to leverage the performance improvements of asynchronous 
+HTTP servers.  In any case, the delineation ensures that processor-intensive data 
+operations aren’t competing with template rendering code for resources.
+
+## Usage
 Using Fissile is as simple as:
 
 * all queries to the database (or other external services) should be in
@@ -47,10 +85,10 @@ Using Fissile is as simple as:
         * combined
     * set the backend execution selector (only matters if the execution mode is 'backend')
     
-## Example
+### Example
 To illustrate how Fissile works, a simple simple follows.
 
-### Brittle Way
+#### Brittle Way
 In this example, there's no abstraction and the view method is interacting directly with the database.
 
 Any tests we might write would necessarily be dependent on an external component.
@@ -69,7 +107,7 @@ urlpatterns = [
 ]
 ```
 
-### Less Brittle Way
+#### Less Brittle Way
 This example shows an abstracted data layer.  The view calls the lkp_thing() method which,
 in turn, interacts with the database.
 
@@ -97,7 +135,7 @@ urlpatterns = [
 ]
 ```
 
-### With Fissile
+#### With Fissile
 This example uses the fissile decorator on the data layer abstraction method.
 
 With Fissile, the return value of the abstraction layer must be serialized, so there's
@@ -127,3 +165,10 @@ urlpatterns = [
 ]
 fissile.append_urls(urlpatterns, [serialized_lkp_thing.to_path()])
 ```
+
+## Feedback
+The goal of this project is to grease the righteous path.  It’s like olympic curling 
+except for software architecture.
+
+I’m still planning out how I want it to work.  If you have anything interesting to say
+ about all this, my email address is fred@frameworklabs.us and I’d love to hear it.
