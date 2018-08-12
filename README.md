@@ -5,7 +5,7 @@ in complex Django sites.
 
 It makes Django a more manageable place.
 
-# The Problem
+## The Problem
 I’ve recently been working with a codebase that’s very mature and the data layer
 is very concrete and difficult to change because there is no abstraction at all
 and the ORM code is sprinkled throughout the view methods and anywhere else it’s
@@ -22,7 +22,7 @@ pain, but, with Fissile, the benefit of the split into frontend and backend come
 at very little additional cost, so the gains in maintainability and testability 
 will coincide with a drastic performance improvement.
 
-# The Fix
+## The Fix
 So what I’m suggesting is that developers go through their code and replace any 
 database-accessing code with a call to a function or method whose name pretty 
 accurately describe what’s actually happening.  And that function can/should/will 
@@ -60,7 +60,13 @@ def my_view():
 
 From a system-overview perspective, the before-pic looks like this:
 
-![concrete](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/concrete.png?raw=true "Concrete Data Layer Architecture")
+![concrete](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/concrete.png?raw=true "Concrete Data Layer Architecture"){:width="100%"}
+
+This is a database-as-center-of-the-universe architecture.  It works, but it's suboptimal because:
+
+* All tests for view methods require a database.
+* there end up being a lot of duplicate or very similar queries in the code making some types of changes very difficult
+* cpu-intensive data processing tasks are competing for system resources against template rendering code
 
 Next, to split the codebase into frontend and backend servers, simply add the 
 `@fissile.func decorator` to all those data layer functions.
@@ -72,14 +78,14 @@ To run the backend server, simply run ‘fissile-server’
 
 That’s it.
 
-# Feedback
+## Feedback
 The goal of this project is to grease the righteous path.  It’s like the broom guys
  in olympic curling except it’s for software architecture.
  
 I’m still planning out how I want it to work.  If you have anything interesting to 
 say about all this, my email address is fred@frameworklabs.us and I’d love to hear 
 it.
-
+************ OLD **************
 #### Brittle Way
 In this example, there's no abstraction and the view method is interacting directly with the database.
 
