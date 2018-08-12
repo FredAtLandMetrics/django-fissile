@@ -76,7 +76,9 @@ had been made by simply updating the single new method.
 So the after-pic of this change looks like this:
 ![abstract](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/abstract.png?raw=true "Abstracted Data Layer Architecture")
 
-Next, to split the codebase into frontend and backend servers, simply add the 
+This is the point where it begins to make sense to use Fissile.
+
+To use Fissile to split the codebase into frontend and backend servers, simply add the 
 `@fissile.func decorator` to all those data layer functions.
 
 Then, in your settings file, you’ll set FISSILE_EXEC_MODE to ‘frontend’ and set 
@@ -86,76 +88,14 @@ To run the backend server, simply run ‘fissile-server’
 
 That’s it.
 
-## Feedback
-The goal of this project is to grease the righteous path.  It’s like the broom guys
- in olympic curling except it’s for software architecture.
- 
-I’m still planning out how I want it to work.  If you have anything interesting to 
-say about all this, my email address is fred@frameworklabs.us and I’d love to hear 
-it.
-************ OLD **************
-#### Brittle Way
-In this example, there's no abstraction and the view method is interacting directly with the database.
+At this point, the system architecture overview looks like this:
 
-Any tests we might write would necessarily be dependent on an external component.
-```
-def my_view():
-    return JsonResponse(
-        to_serializable(
-            ThingModel.object.get(
-                param1: 'this'
-            )
-        )
-    )
-    
-urlpatterns = [
-    path('', my_view, name='my_view')
-]
-```
+![separate](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/separate.png?raw=true "Separated Data Layer Architecture")
 
-#### Less Brittle Way
-This example shows an abstracted data layer.  The view calls the lkp_thing() method which,
-in turn, interacts with the database.
+In the context of the example code above, it looks like this:
 
-To add a test for the view method, we could mock the lkp_thing() method, which would be
-very performant, having no external dependencies.
-
-Of course, the test for the lkp_thing() method would still require a database, but if this
-were a larger, fairly typical Django codebase, it would be reasonable to expect that this
-sort of abstraction pattern would place significantly less demand on a database than a Django
-installation which was structured like the code in the previous example.
-
-```
-def lkp_thing(p1):
-    return to_serializable((
-        ThingModel.object.get(
-            param1: p1
-        )
-    )
-
-def my_view():
-    return JsonResponse(lkp_thing('this'))
-    
-urlpatterns = [
-    path('myview', my_view, name='my_view')
-]
-```
-
-#### With Fissile
-This example uses the fissile decorator on the data layer abstraction method.
-
-With Fissile, the return value of the abstraction layer must be serialized, so there's
-a bit more code related to that, but it's pretty much the same except for the decorator,
-which defines, among other things, a url route by which the function may be reached via an
-HTTP endpoint.
-
-The big difference is that, once a function has been decorated with the @fissile.func
-decorator, the app can be configured to translate all calls to the decorated function,
-in this case serialized_lkp_thing() to an HTTP request to a backend server, such that the
-web service is split into a frontend HTTP server that queries one or more backend HTTP
-servers for data.
-```
-@fissile.func(url='thing/<param1>/', selector='thing', name='thing_search')
+```python
+@fissile.func
 def serialized_lkp_thing(p1):
     return to_serializable(
         ThingModel.object.get(
@@ -165,16 +105,12 @@ def serialized_lkp_thing(p1):
 
 def my_view():
     return JsonResponse(serialized_lkp_thing('this'))
-    
-urlpatterns = [
-    path('myview', my_view, name='my_view')
-]
-fissile.append_urls(urlpatterns, [serialized_lkp_thing.to_path()])
 ```
 
 ## Feedback
-The goal of this project is to grease the righteous path.  It’s like olympic curling 
-except for software architecture.
-
-I’m still planning out how I want it to work.  If you have anything interesting to say
- about all this, my email address is fred@frameworklabs.us and I’d love to hear it.
+The goal of this project is to grease the righteous path.  It’s like the broom guys
+ in olympic curling except it’s for software architecture.
+ 
+I’m still planning out how I want it to work.  If you have anything interesting to 
+say about all this, my email address is fred@frameworklabs.us and I’d love to hear 
+it.
