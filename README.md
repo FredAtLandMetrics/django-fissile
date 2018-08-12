@@ -5,7 +5,7 @@ in complex Django sites.
 
 It makes Django a more manageable place.
 
-#The Problem
+# The Problem
 I’ve recently been working with a codebase that’s very mature and the data layer
 is very concrete and difficult to change because there is no abstraction at all
 and the ORM code is sprinkled throughout the view methods and anywhere else it’s
@@ -22,7 +22,7 @@ pain, but, with Fissile, the benefit of the split into frontend and backend come
 at very little additional cost, so the gains in maintainability and testability 
 will coincide with a drastic performance improvement.
 
-#The Fix
+# The Fix
 So what I’m suggesting is that developers go through their code and replace any 
 database-accessing code with a call to a function or method whose name pretty 
 accurately describe what’s actually happening.  And that function can/should/will 
