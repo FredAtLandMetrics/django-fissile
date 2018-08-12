@@ -60,7 +60,7 @@ def my_view():
 
 From a system-overview perspective, the before-pic looks like this:
 
-[concrete]: https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/concrete.png?raw=true "Logo Title Text 2"
+![concrete](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/concrete.png?raw=true "Concrete Data Layer Architecture")
 
 Next, to split the codebase into frontend and backend servers, simply add the 
 `@fissile.func decorator` to all those data layer functions.
