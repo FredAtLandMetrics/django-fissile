@@ -60,7 +60,7 @@ def my_view():
 
 From a system-overview perspective, the before-pic looks like this:
 
-![concrete](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/concrete.png?raw=true "Concrete Data Layer Architecture"){:width="100%"}
+![concrete](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/concrete.png?raw=true "Concrete Data Layer Architecture" | width=100%)
 
 This is a database-as-center-of-the-universe architecture.  It works, but it's suboptimal because:
 
