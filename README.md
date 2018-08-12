@@ -45,7 +45,7 @@ def my_view():
         )
     )
 ```
-I'd suggest moving toward a pattern like this:
+I advocate moving toward a pattern like this:
 ```python
 def lkp_thing(p1):
     return to_serializable((
@@ -60,13 +60,21 @@ def my_view():
 
 From a system-overview perspective, the before-pic looks like this:
 
-![concrete](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/concrete.png?raw=true "Concrete Data Layer Architecture" | width=100%)
+![concrete](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/concrete.png?raw=true "Concrete Data Layer Architecture")
 
 This is a database-as-center-of-the-universe architecture.  It works, but it's suboptimal because:
 
 * All tests for view methods require a database.
 * there end up being a lot of duplicate or very similar queries in the code making some types of changes very difficult
 * cpu-intensive data processing tasks are competing for system resources against template rendering code
+
+When you add a layer of abstraction around the database access code, the first thing that happens is that all the
+duplicate, and often just similar, queries get transformed into calls to a single function or method.  The next thing
+happens is that it becomes possible to change the behavior of the data layer at every place that query
+had been made by simply updating the single new method.
+
+So the after-pic of this change looks like this:
+![abstract](https://github.com/FredAtLandMetrics/django-fissile/blob/master/static/images/abstract.png?raw=true "Abstracted Data Layer Architecture")
 
 Next, to split the codebase into frontend and backend servers, simply add the 
 `@fissile.func decorator` to all those data layer functions.
