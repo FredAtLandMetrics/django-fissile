@@ -6,28 +6,29 @@ in complex Django sites.
 It makes Django a more manageable place.
 
 ## The Problem
-I’ve recently been working with a codebase that’s very mature and the data layer
-is very concrete and difficult to change because there is no abstraction at all
+I’ve recently been working with a codebase that’s very mature.  The data layer
+is very difficult to change because there is no abstraction at all
 and the ORM code is sprinkled throughout the view methods and anywhere else it’s
 needed.  Running the entire test suite spans the better part of a lunch break
 because nearly every test is an integration test involving the code and the 
 database.
 
-Fissile is a result of my brainstorming about a possible path forward for this 
-codebase.
+This project, Fissile, is a result of my brainstorming about a possible path
+forward for this codebase.
 
-Its goal is to magnify the benefits of moving toward a better architecture 
-pattern.  The hard work of separating out the data access code will still be a 
-pain, but, with Fissile, the benefit of the split into frontend and backend comes 
-at very little additional cost, so the gains in maintainability and testability 
-will coincide with a drastic performance improvement.
+The goal of this project is to magnify the benefits of moving toward a better
+architectural pattern.  The hard work of separating out the data access code will 
+still be a pain, but, with Fissile, the benefit of the split into frontend and 
+backend comes at very little additional cost, so the gains in maintainability 
+and testability will coincide with a drastic performance improvement.
 
 ## The Fix
-So what I’m suggesting is that developers go through their code and replace any 
-database-accessing code with a call to a function or method whose name pretty 
-accurately describe what’s actually happening.  And that function can/should/will 
-pretty much just wrap the original database-accessing code.  That’s step #1.  For 
-my use-case, I suspect this will speed tests by at least 50%.
+What I’m suggesting for this project and for others like it is that the developers
+go through their code and replace any database-accessing code with a call to a 
+function or method whose name pretty accurately describe what’s actually happening.
+And that function can/should/will pretty much just wrap the original 
+database-accessing code.  That’s step #1.  For my use-case, I suspect this will 
+speed tests by at least 50%.
 
 Splitting these functions off into modules that make  sense is fine, but the big 
 idea is just hiding the implementation details about the data storage and query 
