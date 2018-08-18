@@ -1,6 +1,6 @@
 import requests
 
-from django.urls import path
+# from django.urls import path
 from django.http import JsonResponse
 from django.conf import settings
 from django.test import Client
@@ -8,10 +8,10 @@ from django.test import Client
 
 class func(object):
 
-    def __init__(self, route_url_def, name, method='POST'):
-        self.route_url_def = route_url_def
+    def __init__(self, name, tag=None, method='POST'):
         self.name = name
         self.method = method
+        self.tag = tag
 
     def __call__(self, f):
         def wrapped_f(*args, **kwargs):
@@ -20,8 +20,8 @@ class func(object):
             return f(*args, **kwargs)
         return wrapped_f
 
-    def to_path(self):
-        return path(self.route_url_def, self.as_view(), self.name)
+    # def to_path(self):
+    #     return path(self.route_url_def, self.as_view(), self.name)
 
     def as_view(self):
         def view_func(request):

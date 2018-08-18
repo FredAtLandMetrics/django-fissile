@@ -1,15 +1,15 @@
 import fissile
-
+import pytest
 
 fooval1, fooval2 = 0, 0
 
 
-@fissile.func(tag='blah', method='get', argspec=['pval1', 'pval2'])
+@fissile.func(name='foo', tag='blah', method='get')
 def foo_read(pval1=None, pval2=None):
     return [fooval1, fooval2]
 
 
-@fissile.func(tag='blah', method='post')
+@fissile.func(name='foo', tag='blah', method='post')
 def foo_write(pval1=None, pval2=None):
     global fooval1
     global fooval2
@@ -26,8 +26,7 @@ def foo_write(pval1=None, pval2=None):
 
 # show that a call in backend mode produces the expected response
 
-class TestDecorator():
+class TestDecorator(object):
 
-    @patch('')
     def test_it(self):
         assert(False)
